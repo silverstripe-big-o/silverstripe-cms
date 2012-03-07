@@ -122,8 +122,8 @@ JS
 			new GridFieldSortableHeader(),
 			new GridFieldDefaultColumns(),
 			new GridFieldPaginator(15),
-			new GridFieldAction_Edit(),
-			new GridFieldAction_Delete(),
+			new GridFieldEditAction(),
+			new GridFieldDeleteAction(),
 			new GridFieldPopupForms()
 		);
 		$gridField = new GridField('File','Files', $this->getList(), $gridFieldConfig);
