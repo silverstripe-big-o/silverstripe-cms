@@ -2,7 +2,7 @@
 
 	<div class="cms-content-header north">
 		<div>
-			<h2>
+			<h2 id="cms-content-breadcrumbs">
 				<% include CMSBreadcrumbs %>
 			</h2>
 		

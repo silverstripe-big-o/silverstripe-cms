@@ -235,8 +235,32 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 		$items[0]->Title = self::menu_title_for_class('CMSPagesController');
 		$items[0]->Link = singleton('CMSPagesController')->Link();
 
+		//special case for building the breadcrumbs when calling the listchildren Pages ListView action
+		if($this->urlParams['Action'] == 'listchildren' && !empty($this->urlParams['ID'])){
+			//get the page we are referencing
+			$parentID = $this->urlParams['ID'];
+			$page = DataObject::get_by_id('SiteTree',$parentID);
+
+			//build a reversed list of the parent tree
+			$pages = array();
+			while($page) {
+				array_unshift($pages, $page);   //add to start of array so that array is in reverse order
+				$page = $page->Parent;
+			}
+
+			//turns the title and link of the breadcrumbs into template-friendly variables
+			foreach($pages as $page) {
+				$item = new StdClass();
+				$item->Title = $page->Title;
+				$item->Link = $link = singleton('CMSPagesController')->Link('listchildren')."/".$page->ID;
+				$item->ListChildren = true; //flag so the templates knows to set a different class on the link
+				$items->push(new ArrayData($item));
+			}
+		}
+
 		return $items;
 	}
+
 
 	/**
 	 * Create serialized JSON string with site tree hints data to be injected into
@@ -564,7 +588,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 			if(count($ids)) $list->where('"'.$this->stat('tree_class').'"."ID" IN ('.implode(",", $ids).')');
 		}else{
 			$parentID = 0;
-			if($this->urlParams['Action'] == 'listchildren' && $this->urlParams['ID']){
+			if($this->urlParams['Action'] == 'listchildren' && !empty($this->urlParams['ID'])){
 				$parentID = $this->urlParams['ID'];
 			}
 			$list->filter("ParentID", $parentID);
@@ -643,7 +667,17 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 	
 	public function listchildren(){
 		if(Director::is_ajax()){
-			return $this->getListViewHTML();
+			//build a list of hidden breadcrumbs to return with when the ListView is returned via ajax
+			$breadcrumbsArrayList = $this->Breadcrumbs();
+			$wrapper = array();
+			$wrapper['Breadcrumbs'] = $breadcrumbsArrayList;
+			$wrappedBreadcrumbs = new ArrayData($wrapper);
+
+			//add the breadcrumbs into a hidden field after the form containing the ListView DataGrid
+			return $this->getListViewHTML() .
+					'<div id="cms-content-listview-breadcrumbs-replacement" class="hide">' .
+					$wrappedBreadcrumbs->renderWith('CMSBreadcrumbs') .
+					'</div>';
 		}else{
 			return $this;
 		}

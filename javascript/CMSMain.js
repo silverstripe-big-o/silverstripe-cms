@@ -133,17 +133,51 @@
 			},
 			replace: function(url){
 				if(window.History.enabled) {
-					var container = $('.cms-container')
+					//replace the breadcrumbs with hidden breadcrumbs loaded by ajax in the panel load above
+					var container = $('.cms-container');
+					var ve = container.data('events');
+					//only bind event if it isn't already bound
+					if (ve != null && typeof(ve.afterstatechange) !== undefined) {
+						container.bind('afterstatechange.breadcrumbs', function() {
+							//copy the content of the hidden breadcrumbs in under the GridField to the right place in the HTML
+							$('#cms-content-breadcrumbs').html($('#cms-content-listview-breadcrumbs-replacement').html());
+						});
+					}
+
+					//load the new GridField
 					container.loadPanel(url, '', {selector: '.cms-list form'});
 				} else {
 					window.location = $.path.makeUrlAbsolute(url, $('base').attr('href'));
 				}
 			}
 		});
-		
-		$('.cms-list .list-children-link').entwine({
+
+		$('.cms-content').entwine({
+			/**
+			 * Hide or show the full expanded breadcrumbs list when switching between Pages LiewView and TreeView
+			 */
+			tabBreadcrumbs: function(index) {
+				if (index == 1) {
+					//show the full breadcrumb display for the list view
+					$('div.breadcrumbs-full').show();
+					$('div.breadcrumbs-default').hide();
+				} else {
+					//display the default "Pages" in the breadcrumb list, i.e. hide the breadcrumb display
+					$('div.breadcrumbs-full').hide();
+					$('div.breadcrumbs-default').show();
+				}
+			},
+			ontabsselect: function(event, ui) {
+				this.tabBreadcrumbs(ui.index);
+			},
+			ontabscreate: function(event, ui) {
+				this.tabBreadcrumbs(ui.index);
+			}
+		});
+
+		$('#cms-content-listview .list-children-link, #cms-content-listview-breadcrumbs .list-children-link').entwine({
 			onclick: function(e) {
-				this.closest('.cms-list').replace(this.attr('href'));
+				$('#cms-content-listview .cms-list').replace(this.attr('href'));
 				e.preventDefault();
 				return false;
 
