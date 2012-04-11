@@ -172,7 +172,7 @@
 			}
 		});
 
-		$('#cms-content-listview .list-children-link, #cms-content-listview-breadcrumbs .list-children-link').entwine({
+		$('#cms-content-listview .list-children-link, #cms-content-breadcrumbs .list-children-link').entwine({
 			onclick: function(e) {
 				$('#cms-content-listview .cms-list').replace(this.attr('href'));
 				e.preventDefault();
