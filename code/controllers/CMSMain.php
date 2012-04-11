@@ -637,9 +637,10 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 			new FieldList($gridField),
 			new FieldList()
 		);
+		$listview->addExtraClass('cms-edit-form');
 
 		$this->extend('updateListView', $listview);
-		
+
 		$listview->disableSecurityToken();
 		return $listview;
 	}
