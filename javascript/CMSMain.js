@@ -169,9 +169,6 @@
 			},
 			ontabsselect: function(event, ui) {
 				this.tabBreadcrumbs(ui.index);
-			},
-			ontabscreate: function(event, ui) {
-				this.tabBreadcrumbs(ui.index);
 			}
 		});
 
