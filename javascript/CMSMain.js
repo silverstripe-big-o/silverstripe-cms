@@ -140,7 +140,9 @@
 					if (ve != null && typeof(ve.afterstatechange) !== undefined) {
 						container.bind('afterstatechange.breadcrumbs', function() {
 							//copy the content of the hidden breadcrumbs in under the GridField to the right place in the HTML
-							$('#cms-content-breadcrumbs').html($('#cms-content-listview-breadcrumbs-replacement').html());
+							if ($('#cms-content-listview-breadcrumbs-replacement').length > 0) {
+								$('#cms-content-breadcrumbs').html($('#cms-content-listview-breadcrumbs-replacement').html());
+							}
 						});
 					}
 
