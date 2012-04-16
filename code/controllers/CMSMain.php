@@ -687,7 +687,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 	}
 	
 	public function filter($request) {
-		if(Director::is_ajax()){
+		if($request->isAjax()){
 			$negotiator = $this->getResponseNegotiator();
 			$request->addHeader('X-Pjax', 'filterlist');
 			$controller = $this;
