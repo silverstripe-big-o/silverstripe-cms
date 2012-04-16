@@ -64,10 +64,9 @@
 				//this.find(':submit').attr('disabled', true);
 		
 				this.find(':submit[name=action_doSearchTree]').addClass('loading');
-				
 				var params = this.serializeArray();
 				this._reloadSitetree(params);
-				this._reloadListview(params);
+				this._reloadListview(this.serialize());
 
 				return false;
 			},
@@ -87,6 +86,7 @@
 				this.find('.field.dropdown select').val('').trigger("liszt:updated");
 				this._reloadSitetree();
 				this._reloadListview();
+				e.stopPropagation();
 				return false;
 			},
 	
@@ -95,7 +95,6 @@
 			 */
 			_reloadSitetree: function(params) {
 				var self = this;
-		
 				$('.cms-tree').search(
 					params,
 					function() {
@@ -111,26 +110,16 @@
 			},
 			
 			_reloadListview: function(params){
-				$('.cms-list').refresh(params);
+				var url = this.attr('action');
+				if(params) url += '?' + params;
+				var container = $('.cms-container');
+				container.loadPanel(url, '', {selector: '.cms-list form'});
+				return false;
 				
 			}
 		});
 		
 		$('#cms-content-listview .cms-list').entwine({
-			refresh: function(params){
-				var self = this;
-				
-				$.ajax({
-					url: this.data('url-list'),
-					data: params,
-					success: function(data, status, xhr) {
-						self.html(data);
-					},
-					error: function(xhr, status, e) {
-						errorMessage(e);
-					}
-				});
-			},
 			replace: function(url){
 				if(window.History.enabled) {
 					//replace the breadcrumbs with hidden breadcrumbs loaded by ajax in the panel load above

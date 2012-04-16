@@ -12,3 +12,7 @@
 	</div>
 </div>
 <% include CMSPagesController_ContentToolActions %>
+
+<div class="cms-content-batchactions">
+	$BatchActionsForm
+</div>

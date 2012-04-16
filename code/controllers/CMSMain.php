@@ -46,6 +46,7 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 		'ListView',
 		'getListView',
 		'listchildren',
+		'filter',
 	);
 	
 	public function init() {
@@ -213,7 +214,9 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 		
 		$form = new Form($this, 'SearchForm', $fields, $actions);
 		$form->setFormMethod('GET');
+		$form->loadDataFrom($this->request->getVars());
 		$form->disableSecurityToken();
+		$form->setFormAction(Controller::join_links($this->Link('filter')));
 		$form->unsetValidator();
 		
 		return $form;
@@ -678,6 +681,21 @@ class CMSMain extends LeftAndMain implements CurrentPageIdentifier, PermissionPr
 					'<div id="cms-content-listview-breadcrumbs-replacement" class="hide">' .
 					$wrappedBreadcrumbs->renderWith('CMSBreadcrumbs') .
 					'</div>';
+		}else{
+			return $this;
+		}
+	}
+	
+	public function filter($request) {
+		if(Director::is_ajax()){
+			$negotiator = $this->getResponseNegotiator();
+			$request->addHeader('X-Pjax', 'filterlist');
+			$controller = $this;
+			return $negotiator->respond($request, array('filterlist' =>
+				function() use(&$controller) {
+					return $controller->getListViewHTML();
+				}
+			));
 		}else{
 			return $this;
 		}
